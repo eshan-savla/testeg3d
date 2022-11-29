@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import numpy as np
 import open3d as o3d
 import rospy
@@ -8,7 +8,7 @@ from std_msgs.msg import Header
 import sensor_msgs.point_cloud2 as pc2
 from tqdm import tqdm
 from sensor_msgs.msg import PointCloud2
-import message_filters
+from testeg3d.msg import CloudData
 
 class PCLGenerator:
     def __init__(self, file, test: bool = False):
@@ -70,7 +70,7 @@ def arrayToPointcloud2(array, frame_id: str, timestamp=[]) -> PointCloud2:
     return pcl2
 
 def publisher(test: bool = False):
-    pub = rospy.Publisher('LaserValues', PointCloud2, queue_size=1000)
+    pub = rospy.Publisher('LaserValues', CloudData, queue_size=1000)
     rospy.loginfo("Created Publisher")
     rospy.init_node('laser_publisher', log_level=rospy.DEBUG)
     rospy.loginfo("Node initialized")
@@ -80,17 +80,27 @@ def publisher(test: bool = False):
     virtual_pcl = PCLGenerator(file, test=test)
     generator = virtual_pcl.generate()
     i = 0
+    first = True
     while not rospy.is_shutdown() and not virtual_pcl.is_exhausted():
         pub_data = PointCloud2()
         data: np.ndarray = next(generator)
         points = data["cloud"]
-        scan_dir = data["tfToWorld"]
+        msg = CloudData()
+        msg.quartenion = data["tfToWorld"][0]
+        msg.point_vector = data["tfToWorld"][1]
+        msg.first = False
+        msg.last = False
+        if first:
+            msg.first = True
+            first = False
+        if virtual_pcl.is_exhausted():
+            msg.last = True
         points_shape = points.shape
         first_points = points[0, :]
-        pub_data = arrayToPointcloud2(points, "sensor", rospy.Time.now())
+        msg.cloud = arrayToPointcloud2(points, "sensor", rospy.Time.now())
         # rospy.loginfo(f"Publishing data with first points: {first_points} and shape {points_shape}")
         rospy.logwarn_once(f"Publish started at: {rospy.get_time()}")
-        pub.publish(pub_data)
+        pub.publish(msg)
         # rospy.loginfo("Published points from virtual pcl")
         rate.sleep()
     rospy.logwarn_once(f"Publish finished at: {rospy.get_time()}")

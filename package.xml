@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>feature_line_tracing_test</name>
+  <name>testeg3d</name>
   <version>0.0.0</version>
   <description>The feature_line_tracing_test package</description>
 
@@ -49,6 +49,7 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
+
   <build_depend>geometry_msgs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
@@ -58,8 +59,7 @@
   <build_depend>tf2_sensor_msgs</build_depend>
   <build_depend>processit_msgs</build_depend>
   <build_depend>processit_core</build_depend>
-
-
+  <build_depend>message_generation</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
@@ -71,7 +71,6 @@
   <build_export_depend>processit_msgs</build_export_depend>
   <build_export_depend>processit_core</build_export_depend>
 
-
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
@@ -80,6 +79,7 @@
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>processit_msgs</exec_depend>
   <exec_depend>processit_core</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
 
 
 

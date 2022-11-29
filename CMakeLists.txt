@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(feature_line_tracing_test)
+project(testeg3d)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -12,6 +12,7 @@ geometry_msgs
 pcl_ros
 roscpp
 rospy
+message_generation
 std_msgs
 tf2_ros
 tf2_sensor_msgs
@@ -60,7 +61,6 @@ find_package(OpenMP REQUIRED)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
-  DIRECTORY  ../msg
   FILES CloudData.msg
 )
 
@@ -119,8 +119,8 @@ catkin_package(
  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs
                 pcl_ros roscpp rospy
                 std_msgs tf2_ros tf2_sensor_msgs
-                processit_msgs processit_core
- DEPENDS system_lib PCL
+                processit_msgs processit_core message_runtime
+ DEPENDS PCL
 )
 
 ###########
@@ -176,10 +176,10 @@ target_link_libraries(${PROJECT_NAME}
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# catkin_install_python(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+catkin_install_python(PROGRAMS
+  src/ScanPublisher.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
