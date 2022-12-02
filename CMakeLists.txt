@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(testeg3d)
+project(feature_line_tracing_test)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -61,6 +61,7 @@ find_package(OpenMP REQUIRED)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
+  DIRECTORY msg
   FILES CloudData.msg
 )
 
@@ -203,11 +204,11 @@ catkin_install_python(PROGRAMS
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  publisher.launch
+  # myfile2
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

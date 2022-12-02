@@ -1,0 +1,3 @@
+<launch>
+    <node name = "cloud_publisher" pkg="feature_line_tracing_test" type="ScanPublisher.py" output="screen"/>
+</launch>

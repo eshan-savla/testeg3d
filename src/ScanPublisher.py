@@ -3,7 +3,6 @@ import numpy as np
 import open3d as o3d
 import rospy
 import os
-from processit_core import py_util
 from std_msgs.msg import Header
 import sensor_msgs.point_cloud2 as pc2
 from tqdm import tqdm
@@ -18,7 +17,7 @@ class PCLGenerator:
         self.save_pcl()
 
     def is_exhausted(self):
-        return self.__is_exhausted
+        return self.__is_exhausted 
 
     def save_pcl(self):
         cwd = os.getcwd()
@@ -76,7 +75,7 @@ def publisher(test: bool = False):
     rospy.loginfo("Node initialized")
     rospy.on_shutdown(PCLGenerator.on_shutdown)
     rate = rospy.Rate(100)
-    file = "src/data/scan_211115_163654.npy"
+    file = "data/scan_211115_163654.npy"
     virtual_pcl = PCLGenerator(file, test=test)
     generator = virtual_pcl.generate()
     i = 0
@@ -86,8 +85,8 @@ def publisher(test: bool = False):
         data: np.ndarray = next(generator)
         points = data["cloud"]
         msg = CloudData()
-        msg.quartenion = data["tfToWorld"][0]
-        msg.point_vector = data["tfToWorld"][1]
+        msg.point_vector = data["tfToWorld"][0]
+        msg.quartenion = data["tfToWorld"][1]
         msg.first = False
         msg.last = False
         if first:

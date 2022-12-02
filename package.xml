@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>testeg3d</name>
+  <name>feature_line_tracing_test</name>
   <version>0.0.0</version>
   <description>The feature_line_tracing_test package</description>
 
@@ -70,6 +70,8 @@
   <build_export_depend>tf2_sensor_msgs</build_export_depend>
   <build_export_depend>processit_msgs</build_export_depend>
   <build_export_depend>processit_core</build_export_depend>
+  <build_export_depend>message_runtime</build_export_depend>
+
 
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
