@@ -1,12 +1,8 @@
-#include <ros/ros.h>
-#include <feature_line_tracing_test/CloudData.h>
-
 #include "ScanProcessor.h"
 
 
-ScanProcessor::ScanProcessor(ros::NodeHandle* nh) : raw_cl2(new pcl::PCLPointCloud2) {
+ScanProcessor::ScanProcessor(ros::NodeHandle* nh) : nh(*nh),raw_cl2(new pcl::PCLPointCloud2) {
     ROS_INFO("Initializing processor");
-    this->nh = *nh;
     dir_vec.setZero(3);
     raw_cloud_count = 0;
     initSubscribers();
@@ -18,7 +14,7 @@ void ScanProcessor::initSubscribers() {
 
 }
 
-void ScanProcessor::msgCallBack(const feature_line_tracing_test::CloudData& cloud_data) {
+void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
     std::vector<float> quartenion = cloud_data.quartenion;
     std::vector<float> point_vector = cloud_data.point_vector;
     Eigen::Vector3f current_vec = getDirectionVector(quartenion, point_vector);

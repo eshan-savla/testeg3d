@@ -1,3 +1,5 @@
+#pragma once
+
 #include "RawCloud.h"
 #include "EdgeCloud.h"
 
@@ -6,7 +8,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <sensor_msgs/LaserScan.h>
 #include <processit_msgs/ScanData.h>
-#include <feature_line_tracing_test/CloudData.h>
+#include <testeg3d/CloudData.h>
 
 class ScanProcessor
 {
@@ -24,7 +26,7 @@ private:
 public:
     ScanProcessor(ros::NodeHandle* nh);
     void initSubscribers();
-    void msgCallBack(const feature_line_tracing_test::CloudData& cloud_data);
+    void msgCallBack(const testeg3d::CloudData& cloud_data);
     pcl::PointCloud<pcl::PointXYZ> getEdgePoints(const sensor_msgs::PointCloud2Ptr cloud_in);
     pcl::PointCloud<pcl::PointXYZ> getSegments(const pcl::PointCloud<pcl::PointXYZ>& raw_cl2);
     ~ScanProcessor();

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(feature_line_tracing_test)
+project(testeg3d)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -150,7 +150,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME} src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG3D/EdgeCloud.cpp src/EG3D/RawCloud.cpp)
+add_executable(ScanPublisher src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG3D/EdgeCloud.cpp src/EG3D/RawCloud.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -162,10 +162,10 @@ add_executable(${PROJECT_NAME} src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(ScanPublisher PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include
+target_link_libraries(ScanPublisher PRIVATE ${PROJECT_SOURCE_DIR}/include
   PUBLIC ${catkin_LIBRARIES} PUBLIC ${PCL_LIBRARIES} PUBLIC OpenMP::OpenMP_CXX
 )
 # add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages.cpp)

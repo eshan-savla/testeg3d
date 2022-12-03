@@ -1,4 +1,4 @@
 <launch>
-    <node name = "cloud_publisher" pkg="feature_line_tracing_test" type="ScanPublisher.py" output="screen"/>
-    <node name = "cloud_processor" pkg="feature_line_tracing_test" type="ScanProcessor" output="screen"/>
+    <node name = "cloud_publisher" pkg="testeg3d" type="ScanPublisher.py" output="screen"/>
+    <node name = "cloud_processor" pkg="testeg3d" type="ScanProcessor" output="screen"/>
 </launch>

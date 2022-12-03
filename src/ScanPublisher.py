@@ -28,7 +28,7 @@ class PCLGenerator:
         points = np.concatenate(points, axis=0)
         pcl = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
         rospy.logwarn(f"Number of points in pointcloud: {len(pcl.points)}")
-        o3d.io.write_point_cloud("/home/chl-es/before_filter.pcd", pcl)
+        # o3d.io.write_point_cloud("/home/chl-es/before_filter.pcd", pcl)
         rospy.logdebug("Wrote unfiltered pointcloud file")
 
     def generate(self):
@@ -74,8 +74,8 @@ def publisher(test: bool = False):
     rospy.init_node('laser_publisher', log_level=rospy.DEBUG)
     rospy.loginfo("Node initialized")
     rospy.on_shutdown(PCLGenerator.on_shutdown)
-    rate = rospy.Rate(100)
-    file = "data/scan_211115_163654.npy"
+    rate = rospy.Rate(10)
+    file = "/home/chl-es/TestEG3D/src/testeg3d/data/scan_211115_163654.npy"
     virtual_pcl = PCLGenerator(file, test=test)
     generator = virtual_pcl.generate()
     i = 0
