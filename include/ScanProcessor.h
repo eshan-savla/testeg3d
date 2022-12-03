@@ -13,14 +13,19 @@ class ScanProcessor
 private:
     ros::NodeHandle nh;
     bool valid;
+    int raw_cloud_count;
     ros::Subscriber cloud_data_sub;
-    pcl::PointCloud<pcl::PointXYZ>::Ptr edge_points;
-    /* data */
+    pcl::PCLPointCloud2::Ptr raw_cl2;
+    Eigen::Vector3f dir_vec;
+    EdgeCloud edge_cloud;
+
+    static Eigen::Vector3f getDirectionVector(std::vector<float>& quartenion, std::vector<float>& start_point);
+
 public:
     ScanProcessor(ros::NodeHandle* nh);
     void initSubscribers();
     void msgCallBack(const feature_line_tracing_test::CloudData& cloud_data);
     pcl::PointCloud<pcl::PointXYZ> getEdgePoints(const sensor_msgs::PointCloud2Ptr cloud_in);
-    pcl::PointCloud<pcl::PointXYZ> getSegments(const pcl::PointCloud<pcl::PointXYZ>& edge_points);
+    pcl::PointCloud<pcl::PointXYZ> getSegments(const pcl::PointCloud<pcl::PointXYZ>& raw_cl2);
     ~ScanProcessor();
 };

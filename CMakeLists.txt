@@ -132,6 +132,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
+  src/EG3D
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
 )
@@ -149,7 +150,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME} src/ScanProcessor.cpp)
+add_executable(${PROJECT_NAME} src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG3D/EdgeCloud.cpp src/EG3D/RawCloud.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -164,9 +165,11 @@ add_executable(${PROJECT_NAME} src/ScanProcessor.cpp)
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include
   PUBLIC ${catkin_LIBRARIES} PUBLIC ${PCL_LIBRARIES} PUBLIC OpenMP::OpenMP_CXX
 )
+# add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages.cpp)
+
 
 #############
 ## Install ##
@@ -206,7 +209,7 @@ catkin_install_python(PROGRAMS
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
   publisher.launch
-  # myfile2
+  node.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
