@@ -150,7 +150,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(ScanPublisher src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG3D/EdgeCloud.cpp src/EG3D/RawCloud.cpp)
+add_executable(ScanProcessor src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG3D/EdgeCloud.cpp src/EG3D/RawCloud.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -160,12 +160,12 @@ add_executable(ScanPublisher src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ScanProcessor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_include_directories(ScanPublisher PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(ScanProcessor PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ScanPublisher PRIVATE ${PROJECT_SOURCE_DIR}/include
+target_link_libraries(ScanProcessor
   PUBLIC ${catkin_LIBRARIES} PUBLIC ${PCL_LIBRARIES} PUBLIC OpenMP::OpenMP_CXX
 )
 # add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages.cpp)
