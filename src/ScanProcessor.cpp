@@ -44,7 +44,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl1);
         raw_cloud.StatOutlierRemoval(50, 0.01);
-        raw_cloud.VoxelDownSample(0.0001f);
+        raw_cloud.VoxelDownSample(0.0005f);
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
         *edges = raw_cloud.FindEdgePoints(200, M_PI_2);
@@ -53,9 +53,9 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         edge_cloud.SetScanDirection(dir_vec);
         edge_cloud.AddPoints(edges);
         ROS_INFO("Appended edge points");
-        edge_cloud.ComputeVectors(15, 0.01, false);
+        edge_cloud.ComputeVectors(50, 0.01, false);
         ROS_INFO("Computed point vectors");
-        edge_cloud.ApplyRegionGrowing(15, 10.0 / 180.0 * M_PI, true);
+        edge_cloud.ApplyRegionGrowing(50, 20.0 / 180.0 * M_PI, true);
         ROS_INFO("Segmented edges");
 
         if (cloud_data.last)
