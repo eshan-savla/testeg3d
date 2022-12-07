@@ -37,14 +37,14 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         *raw_cl2 += *new_input;
         dir_vec += current_vec;
         ROS_INFO("segmenting edges");
-        ROS_INFO_STREAM_ONCE("Angle btw scan direction vectors: " << std::abs(dir_vec.dot(current_vec))/(dir_vec.norm() * current_vec.norm()) << std::endl);
+        // ROS_INFO_STREAM_ONCE("Angle btw scan direction vectors: " << std::acos(std::abs(dir_vec.dot(current_vec))/(dir_vec.norm() * current_vec.norm())) << std::endl);
         pcl::PointCloud<pcl::PointXYZ>::Ptr raw_cl1 (new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromPCLPointCloud2(*raw_cl2, *raw_cl1);
         // pcl::io::savePCDFileASCII("/home/chl-es/TestEG3D/src/testeg3d/data/raw_cloud.pcd", *raw_cl1);
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl1);
         raw_cloud.StatOutlierRemoval(50, 0.01);
-        raw_cloud.VoxelDownSample(0.0005f);
+        raw_cloud.VoxelDownSample(0.0001f);
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
         *edges = raw_cloud.FindEdgePoints(200, M_PI_2);
