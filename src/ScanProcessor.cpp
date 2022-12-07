@@ -22,7 +22,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
     // ROS_INFO("Calculated direction vector");
     pcl::PCLPointCloud2::Ptr new_input (new pcl::PCLPointCloud2);
     pcl_conversions::toPCL(cloud_data.cloud, *new_input);
-    if (raw_cloud_count < 200)
+    if (raw_cloud_count < 200 && !cloud_data.last)
     {
         *raw_cl2 += *new_input;
         // ROS_INFO_STREAM("Raw cloud size: " << raw_cl2->height * raw_cl2->width);
@@ -32,6 +32,10 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
     }
     else
     {
+        if(cloud_data.last)
+            ROS_WARN("Last point recieved");
+        *raw_cl2 += *new_input;
+        dir_vec += current_vec;
         ROS_INFO("segmenting edges");
         ROS_INFO_STREAM_ONCE("Angle btw scan direction vectors: " << std::abs(dir_vec.dot(current_vec))/(dir_vec.norm() * current_vec.norm()) << std::endl);
         pcl::PointCloud<pcl::PointXYZ>::Ptr raw_cl1 (new pcl::PointCloud<pcl::PointXYZ>);
@@ -49,16 +53,25 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         edge_cloud.SetScanDirection(dir_vec);
         edge_cloud.AddPoints(edges);
         ROS_INFO("Appended edge points");
-        edge_cloud.ComputeVectors(50, 0.01, false);
+        edge_cloud.ComputeVectors(15, 0.01, false);
         ROS_INFO("Computed point vectors");
-        edge_cloud.ApplyRegionGrowing(50, 0.01, true);
+        edge_cloud.ApplyRegionGrowing(15, 10.0 / 180.0 * M_PI, true);
         ROS_INFO("Segmented edges");
 
+        if (true)
+        {
+            ROS_INFO("Saving edge points");
+            edge_cloud.SaveCloud("/home/chl-es/TestEG3D/src/testeg3d/data/edge_points.pcd");
+            edge_cloud.AssembleRegions();
+            ROS_INFO("Assembled segments");
+            edge_cloud.CreateColouredCloud("/home/chl-es/TestEG3D/src/testeg3d/data/segments.pcd");
+            ROS_INFO("Saved segments");
+            // ros::shutdown();
+        }
+        
         dir_vec.setZero(3);
         raw_cloud_count = 0;
 
-        *raw_cl2 += *new_input;
-        dir_vec += current_vec;
         raw_cloud_count++;
 
     }
@@ -75,7 +88,6 @@ Eigen::Vector3f ScanProcessor::getDirectionVector(std::vector<float>& quartenion
 }
 
 ScanProcessor::~ScanProcessor() {
-    ROS_WARN("Explicitly deleting object");
     edge_cloud.AssembleRegions();
     edge_cloud.CreateColouredCloud("/home/chl-es/TestEG3D/src/testeg3d/data/segments.pcd");
     ROS_INFO("Saved segmented cloud.");
@@ -94,11 +106,18 @@ void sigint_handler(int signum) {
 
 
 int main(int argc, char ** argv) {
-    ros::init(argc, argv, "scan_processor");
+    ros::init(argc, argv, "scan_processor", ros::init_options::NoSigintHandler);
     ros::NodeHandle nh;
     ROS_INFO("Start scan processor node");
     ScanProcessor scan_processor(&nh);
     signal(SIGINT, sigint_handler);
-    ros::spin();
+    while (ros::ok)
+    {
+            ros::spin();
+            if (ros::isShuttingDown)
+                scan_processor.~ScanProcessor();
+            
+
+    }    
     return 0;
 }

@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <queue>
 #include "EdgeCloud.h"
+#include <bits/stdc++.h>
 
 
 EdgeCloud::EdgeCloud() : new_points(new pcl::PointCloud<pcl::PointXYZ>), tree(new pcl::search::KdTree<pcl::PointXYZ>) {
@@ -108,6 +109,10 @@ void EdgeCloud::ComputeVectors(const int &neighbours_K, const float &dist_thresh
     int b = 0;
 }
 
+/// @brief 
+/// @param neighbours_k 
+/// @param angle_thresh 
+/// @param sort 
 void EdgeCloud::ApplyRegionGrowing(const int &neighbours_k, const float &angle_thresh, const bool &sort) {
     this->angle_thresh = angle_thresh;
 
@@ -141,18 +146,17 @@ void EdgeCloud::ApplyRegionGrowing(const int &neighbours_k, const float &angle_t
     int seed = point_residual[seed_counter - seed_counter].second;
     int num_of_segmented_pts = total_num_of_segmented_pts;
     int num_of_segments = total_num_of_segments + 1;
-    int size_vec = vectors_map.size();
-    int size_nghbrs =  neighbours_map.size();
-    int size_seg_vec = segment_vectors.size();
-    int size_fin = finished_segments.size();
+
     while (num_of_segmented_pts < num_of_pts) {
         bool new_segment_needed = true;
         // Iterate through all latest segments to check if seed belongs to existing segment
         if (is_appended && !override_cont) {
             for (const int &neighbour: neighbours_map.at(seed)) {
                 int label = point_labels.at(neighbour);
-                if (label != -1 && !finished_segments.at(label)) // Add and statement to check if segment extendable
+                if (label != -1) // Add and statement to check if segment extendable
                 {
+                    if(label >= num_of_segments)
+                        std::cout << "seed: " << seed << " label: " << label << std::endl;
                     Eigen::Vector3f seg_vec = segment_vectors.at(label);
                     int new_pts_in_segment = ExtendSegment(seed, neighbour, label, neighbours_k, seg_vec);
                     if (new_pts_in_segment == 0)
@@ -184,6 +188,13 @@ void EdgeCloud::ApplyRegionGrowing(const int &neighbours_k, const float &angle_t
             num_of_segmented_pts += pts_in_segment;
             num_pts_in_segment.push_back(pts_in_segment);
             num_of_segments++;
+            int max = 0;
+            for (const auto& label: point_labels)
+                if(label > max)
+                    max = label;
+                
+            if(max >= num_of_segments)
+                int a = 0;
         }
 
         for (int i_seed = seed_counter + 1; i_seed < num_of_pts ; i_seed++) {
@@ -197,6 +208,16 @@ void EdgeCloud::ApplyRegionGrowing(const int &neighbours_k, const float &angle_t
     }
     total_num_of_segmented_pts = num_of_segmented_pts;
     total_num_of_segments = num_of_segments;
+}
+
+int EdgeCloud::ExtendSegment(const int &new_point, const int &neighbour, const int &segment_id, const int &neighbours_k,
+                             Eigen::Vector3f &segment_vector) {
+    int num_pts = 0;
+    bool irrelevant;
+    bool in_segment = CheckPoint(neighbour, new_point, irrelevant);
+    if (in_segment)
+        num_pts = GrowSegment(new_point, segment_id, neighbours_k, segment_vector);
+    return num_pts;
 }
 
 int EdgeCloud::GrowSegment(const int &initial_seed, const int &segment_id, const int &neighbours_k,
@@ -256,22 +277,49 @@ bool EdgeCloud::CheckPoint(const int &current_seed, const int &neighbour, bool &
 void EdgeCloud::AssembleRegions() {
     const auto num_of_segs = num_pts_in_segment.size();
     const auto num_of_pts = cloud_data->size();
+    int unlabeled_pts = 0;
+    for (size_t i = 0; i < num_of_pts; i++)
+    {
+        if (point_labels.at(i) == -1)
+            unlabeled_pts++;
+    }
+    int max = 0;
 
-    pcl::PointIndices segment;
+    for(const auto& label: point_labels)
+        if (label > max)
+            max = label;
+    
+    int check1 = finished_segments.size();
+    int check2 = segment_vectors.size();
+    int b = 0;
+
+    std::vector<int> segment;
     clusters.clear();
     clusters.resize(num_of_segs, segment);
 
     for (std::size_t i_seg = 0; i_seg < num_of_segs; ++i_seg)
-        clusters[i_seg].indices.resize(num_pts_in_segment[i_seg], 0);
+        clusters[i_seg].resize(num_pts_in_segment[i_seg], 0);
 
     std::vector<int> counter(num_of_segs, 0);
 
-    for (std::size_t i_point = 0; i_point < num_of_pts; ++i_point) {
-        const auto seg_index = point_labels[i_point];
+    for (size_t i_point = 0; i_point < num_of_pts; i_point++) {
+        if (i_point == 3413)
+            int b = 0;
+        
+        std::cout << "i_point: " << i_point << "\t";
+        const auto seg_index = point_labels.at(i_point);
+        std::cout << "seg_index: " << seg_index << "\t";
         if (seg_index != -1) {
-            const auto pt_index = counter[seg_index];
-            clusters[seg_index].indices[pt_index] = i_point;
-            counter[seg_index] = pt_index + 1;
+            const auto pt_index = counter.at(seg_index);
+            std::cout << "pt_index: " << pt_index << std::endl;
+            if (seg_index > num_of_segs)
+                std::string s = "break here!";
+            if (pt_index >= clusters.at(seg_index).size())
+                std::string s1 = "break here!";
+            clusters.at(seg_index).at(pt_index) = i_point;
+            std::cout << "Problem after assigning to cluster" << std::endl;
+            counter.at(seg_index) = pt_index + 1;
+            std::cout << "Problem after adjusting counter" << std::endl;
         }
     }
 }
@@ -306,7 +354,7 @@ void EdgeCloud::CreateColouredCloud(const std::string &path) {
 
         int next_colour = 0;
         for (const auto &i_seg: clusters) {
-            for (const auto &index : i_seg.indices) {
+            for (const auto &index : i_seg) {
                 (*coloured_cloud)[index].r = colours[3 * next_colour];
                 (*coloured_cloud)[index].g = colours[3 * next_colour + 1];
                 (*coloured_cloud)[index].b = colours[3 * next_colour + 2];
@@ -330,15 +378,6 @@ void EdgeCloud::AddPoints(const pcl::PointCloud<pcl::PointXYZ>::Ptr &new_points)
     }
 }
 
-int EdgeCloud::ExtendSegment(const int &new_point, const int &neighbour, const int &segment_id, const int &neighbours_k,
-                             Eigen::Vector3f &segment_vector) {
-    int num_pts = 0;
-    bool irrelevant;
-    bool in_segment = CheckPoint(neighbour, new_point, irrelevant);
-    if (in_segment)
-        num_pts = GrowSegment(new_point, segment_id, neighbours_k, segment_vector);
-    return num_pts;
-}
 
 bool EdgeCloud::IsFinished(const int &label) {
     if (scan_direction.norm() == 0)

@@ -24,7 +24,7 @@ private:
     std::vector<int> edge_points_indices;
     pcl::PointCloud<pcl::PointXYZ>::Ptr new_points;
     pcl::search::Search<pcl::PointXYZ>::Ptr tree;
-    std::vector<pcl::PointIndices> clusters;
+    std::vector<std::vector<int>> clusters;
     std::vector<unsigned int> num_pts_in_segment;
     std::vector<int> point_labels;
     std::vector<int> previous_seeds;

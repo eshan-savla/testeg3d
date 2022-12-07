@@ -37,7 +37,7 @@ class PCLGenerator:
         for i in tqdm(range(len(scans)), desc="Scan progress"):
             # pos, ori = scan['tfToSensor']
             # T_toSensor = geomTupleToArray(pos, ori)
-            if i >= (len(scans)):
+            if i >= (len(scans) - 1):
                 self.__is_exhausted = True
             data = scans[i]
             if self.test and sum >= 11:
