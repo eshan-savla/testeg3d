@@ -22,7 +22,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
     // ROS_INFO("Calculated direction vector");
     pcl::PCLPointCloud2::Ptr new_input (new pcl::PCLPointCloud2);
     pcl_conversions::toPCL(cloud_data.cloud, *new_input);
-    if (raw_cloud_count < 200 && !cloud_data.last)
+    if (raw_cloud_count < 150 && !cloud_data.last)
     {
         *raw_cl2 += *new_input;
         // ROS_INFO_STREAM("Raw cloud size: " << raw_cl2->height * raw_cl2->width);
@@ -58,7 +58,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         edge_cloud.ApplyRegionGrowing(15, 10.0 / 180.0 * M_PI, true);
         ROS_INFO("Segmented edges");
 
-        if (true)
+        if (cloud_data.last)
         {
             ROS_INFO("Saving edge points");
             edge_cloud.SaveCloud("/home/chl-es/TestEG3D/src/testeg3d/data/edge_points.pcd");
