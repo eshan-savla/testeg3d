@@ -150,7 +150,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(ScanProcessor src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG3D/EdgeCloud.cpp src/EG3D/RawCloud.cpp)
+add_executable(ScanProcessor src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG3D/EdgeCloud.cpp src/EG3D/RawCloud.cpp src/EG3D/BoundingBox.cpp src/EG3D/Region2D.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

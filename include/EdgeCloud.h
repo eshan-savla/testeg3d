@@ -31,6 +31,7 @@ private:
     std::vector<unsigned int> num_pts_in_segment;
     std::vector<int> point_labels;
     std::vector<int> previous_seeds;
+    Eigen::Vector3f first_coord[3], second_coord[3];
 
     float seg_tag_thresh;
     int total_num_of_segmented_pts;
@@ -72,6 +73,7 @@ public:
     void AddPoints(const pcl::PointCloud<pcl::PointXYZ>::Ptr &new_points);
     void SetTagThresh(const float &seg_tag_thresh);
     void SetScanDirection(const Eigen::Vector3f &scan_direction);
+    void SetBoundingCoordinates(const Eigen::Vector3f first[0], const Eigen::Vector3f second[3]);
     void AssembleRegions();
 
 };

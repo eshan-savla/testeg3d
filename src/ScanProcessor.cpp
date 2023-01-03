@@ -16,9 +16,8 @@ void ScanProcessor::initSubscribers() {
 }
 
 void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
-    std::vector<float> quartenion = cloud_data.quartenion;
-    std::vector<float> point_vector = cloud_data.point_vector;
-    Eigen::Vector3f current_vec = getDirectionVector(quartenion, point_vector);
+
+    Eigen::Vector3f current_vec = getDirectionVector(cloud_data);
     // ROS_INFO("Calculated direction vector");
     pcl::PCLPointCloud2::Ptr new_input (new pcl::PCLPointCloud2);
     pcl_conversions::toPCL(cloud_data.cloud, *new_input);
@@ -55,7 +54,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         ROS_INFO("Appended edge points");
         edge_cloud.ComputeVectors(50, 0.01, false);
         ROS_INFO("Computed point vectors");
-        edge_cloud.RemoveFalseEdges(0.001);
+        edge_cloud.RemoveFalseEdges(0.01);
         ROS_INFO("Tagged false edges");
         edge_cloud.ApplyRegionGrowing(50, 20.0 / 180.0 * M_PI, true);
         ROS_INFO("Segmented edges");
@@ -79,13 +78,8 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
     }
 }
 
-Eigen::Vector3f ScanProcessor::getDirectionVector(std::vector<float>& quartenion, std::vector<float>& start_point) {
-    Eigen::Quaternion<float> quat(quartenion[0], quartenion[1], quartenion[2], quartenion[3]);
-    Eigen::Vector3f scan_dir(start_point.data());
-    quat.normalize();
-    Eigen::Matrix3f rot_mat;
-    rot_mat = quat.toRotationMatrix();
-    scan_dir = rot_mat * scan_dir;
+Eigen::Vector3f ScanProcessor::getDirectionVector(const testeg3d::CloudData &cloud_data) {
+    Eigen::Vector3f scan_dir(cloud_data.sensor_y[0], cloud_data.sensor_y[1], cloud_data.sensor_y[2]);
     return scan_dir;
 }
 

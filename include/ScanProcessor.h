@@ -21,7 +21,7 @@ private:
     Eigen::Vector3f dir_vec;
     EdgeCloud edge_cloud;
 
-    static Eigen::Vector3f getDirectionVector(std::vector<float>& quartenion, std::vector<float>& start_point);
+    static Eigen::Vector3f getDirectionVector(const testeg3d::CloudData &cloud_data);
 
 public:
     ScanProcessor(ros::NodeHandle* nh);

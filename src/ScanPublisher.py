@@ -8,6 +8,7 @@ import sensor_msgs.point_cloud2 as pc2
 from tqdm import tqdm
 from sensor_msgs.msg import PointCloud2
 from testeg3d.msg import CloudData
+from scipy.spatial.transform import Rotation as R
 
 class PCLGenerator:
     def __init__(self, file, test: bool = False):
@@ -85,8 +86,16 @@ def publisher(test: bool = False):
         data: np.ndarray = next(generator)
         points = data["cloud"]
         msg = CloudData()
-        msg.point_vector = data["tfToWorld"][0]
-        msg.quartenion = data["tfToWorld"][1]
+        point_vector = data["tfToWorld"][0]
+        quaternion = data["tfToWorld"][1]
+        rot = R.from_quat(quaternion)
+        vec_z = rot.apply(np.array([0, 0, 1]))
+        msg.sensor_z = point_vector + vec_z
+        vec_y = rot.apply(np.array([0, 1, 0]))
+        msg.sensor_y = point_vector + vec_y
+        vec_x = rot.apply(np.array([1, 0, 0]))
+        msg.sensor_x = point_vector + vec_x
+
         msg.first = False
         msg.last = False
         if first:

@@ -9,13 +9,14 @@
 
 class Region2D {
 private:
-    Eigen::Vector3f P1, P2, P3, P4;
-    Eigen::Vector3f u, v;
-    float width, depth;
+    pcl::PointXYZ P1, P4;
+    Eigen::Vector3f width_vec, depth_vec;
+    float xmin, xmax, ymin, ymax;
+
 
 public:
-    Region2D(const pcl::PointXYZ& mid_point1, const pcl::PointXYZ& mid_point2, float width);
-    bool ChechIfPointInRegion(const pcl::PointXYZ point_copy);
+    Region2D(const pcl::PointXYZ& mid_point1, const pcl::PointXYZ& mid_point2, const pcl::PointXYZ& angle_ref, double width);
+    bool ChechIfPointInRegion(const pcl::PointXYZ point);
 };
 
 
