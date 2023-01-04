@@ -20,7 +20,7 @@ processit_msgs
 processit_core
 )
 
-find_package(PCL 1.7 REQUIRED)
+find_package(PCL 1.12 REQUIRED)
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 

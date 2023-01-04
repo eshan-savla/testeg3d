@@ -43,7 +43,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl1);
         raw_cloud.StatOutlierRemoval(50, 0.01);
-        raw_cloud.VoxelDownSample(0.0005f);
+        raw_cloud.VoxelDownSample(0.0001f);
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
         *edges = raw_cloud.FindEdgePoints(200, M_PI_2);
