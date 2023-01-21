@@ -380,7 +380,7 @@ void EdgeCloud::RemoveFalseEdges(float region_width) {
     pcl::PointXYZ box_points[8];
     b_box.GetPoints(box_points);
     Region2D false_region_1(box_points[6], box_points[7], box_points[4], region_width);
-    Region2D false_region_2(box_points[0], box_points[1], box_points[3], region_width);
+    Region2D false_region_2(box_points[0], box_points[1], box_points[2], region_width);
 
     for (std::size_t point_index = previous_size; point_index < cloud_data->size(); ++point_index) {
         if (is_appended) /* && std::cos(std::abs(scan_direction.dot(vectors_map.at(point_index)) /
