@@ -26,7 +26,7 @@ BoundingBox::BoundingBox(const pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_section
     // transformer.block<3,1>(0,3) = -1.f * (transformer.block<3,3>(0,0) * pca_centroid.head<3>());
     // pcl::PointCloud<pcl::PointXYZ>::Ptr projected_cloud (new pcl::PointCloud<pcl::PointXYZ>);
     // pcl::transformPointCloud(*cloud_section, *projected_cloud, transformer);
-    pcl::io::savePCDFileASCII("/home/chl-es/TestEG3D/src/testeg3d/data/projected_cloud.pcd", *pca_projection);
+    pcl::io::savePCDFileASCII("/home/eshan/TestEG3D/src/testeg3d/data/projected_cloud.pcd", *pca_projection);
     pcl::PointXYZ min, max;
     pcl::getMinMax3D(*pca_projection, min, max);
     const Eigen::Vector3f diagonal = 0.5f*(max.getVector3fMap() + min.getVector3fMap());

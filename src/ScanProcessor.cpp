@@ -62,10 +62,10 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         if (cloud_data.last)
         {
             ROS_INFO("Saving edge points");
-            edge_cloud.SaveCloud("/home/chl-es/TestEG3D/src/testeg3d/data/edge_points.pcd");
+            edge_cloud.SaveCloud("/home/eshan/TestEG3D/src/testeg3d/data/edge_points.pcd");
             edge_cloud.AssembleRegions();
             ROS_INFO("Assembled segments");
-            edge_cloud.CreateColouredCloud("/home/chl-es/TestEG3D/src/testeg3d/data/segments.pcd");
+            edge_cloud.CreateColouredCloud("/home/eshan/TestEG3D/src/testeg3d/data/segments.pcd");
             ROS_INFO("Saved segments");
             // ros::shutdown();
         }
