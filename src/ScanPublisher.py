@@ -75,7 +75,7 @@ def publisher(test: bool = False):
     rospy.init_node('laser_publisher', log_level=rospy.DEBUG)
     rospy.loginfo("Node initialized")
     rospy.on_shutdown(PCLGenerator.on_shutdown)
-    rate = rospy.Rate(100)
+    rate = rospy.Rate(10)
     file = "/home/eshan/TestEG3D/src/testeg3d/data/scan_211115_163654.npy"
     virtual_pcl = PCLGenerator(file, test=test)
     generator = virtual_pcl.generate()

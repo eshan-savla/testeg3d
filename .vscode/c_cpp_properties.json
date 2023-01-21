@@ -1,41 +1,42 @@
 {
-  "configurations": [
-    {
-      "browse": {
-        "databaseFilename": "${default}",
-        "limitSymbolsToIncludedHeaders": false
-      },
-      "includePath": [
-        "/home/chl-es/TestEG3D/devel/include/**",
-        "/home/chl-es/processit_ws/devel/include/**",
-        "/opt/ros/noetic/include/**",
-        "/home/chl-es/processit_ws/src/Universal_Robots_ROS_Driver/controller_stopper/include/**",
-        "/home/chl-es/TestEG3D/src/testeg3d/include/**",
-        "/home/chl-es/processit_ws/src/scancontrol/micro_epsilon_scancontrol_driver/include/**",
-        "/home/chl-es/processit_ws/src/moveit_task_constructor/core/include/**",
-        "/home/chl-es/processit_ws/src/moveit_task_constructor/demo/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_adapt/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_cax/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_core/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_program/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_rviz/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_scene/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_sensors/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_tasks/include/**",
-        "/home/chl-es/processit_ws/src/processit/processit_tech/include/**",
-        "/home/chl-es/processit_ws/src/moveit_task_constructor/rviz_marker_tools/include/**",
-        "/home/chl-es/processit_ws/src/Universal_Robots_ROS_Driver/ur_calibration/include/**",
-        "/home/chl-es/processit_ws/src/Universal_Robots_Client_Library/include/**",
-        "/home/chl-es/processit_ws/src/universal_robot/ur_kinematics/include/**",
-        "/home/chl-es/processit_ws/src/Universal_Robots_ROS_Driver/ur_robot_driver/include/**",
-        "/usr/include/**"
-      ],
-      "name": "ROS",
-      "intelliSenseMode": "gcc-x64",
-      "compilerPath": "/usr/bin/gcc",
-      "cStandard": "gnu11",
-      "cppStandard": "c++14"
-    }
-  ],
-  "version": 4
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "${default}",
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "includePath": [
+                "/home/chl-es/TestEG3D/devel/include/**",
+                "/home/chl-es/processit_ws/devel/include/**",
+                "/opt/ros/noetic/include/**",
+                "/home/chl-es/processit_ws/src/Universal_Robots_ROS_Driver/controller_stopper/include/**",
+                "/home/chl-es/TestEG3D/src/testeg3d/include/**",
+                "/home/chl-es/processit_ws/src/scancontrol/micro_epsilon_scancontrol_driver/include/**",
+                "/home/chl-es/processit_ws/src/moveit_task_constructor/core/include/**",
+                "/home/chl-es/processit_ws/src/moveit_task_constructor/demo/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_adapt/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_cax/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_core/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_program/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_rviz/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_scene/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_sensors/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_tasks/include/**",
+                "/home/chl-es/processit_ws/src/processit/processit_tech/include/**",
+                "/home/chl-es/processit_ws/src/moveit_task_constructor/rviz_marker_tools/include/**",
+                "/home/chl-es/processit_ws/src/Universal_Robots_ROS_Driver/ur_calibration/include/**",
+                "/home/chl-es/processit_ws/src/Universal_Robots_Client_Library/include/**",
+                "/home/chl-es/processit_ws/src/universal_robot/ur_kinematics/include/**",
+                "/home/chl-es/processit_ws/src/Universal_Robots_ROS_Driver/ur_robot_driver/include/**",
+                "/usr/include/**",
+                "${workspaceFolder}/include"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++14"
+        }
+    ],
+    "version": 4
 }

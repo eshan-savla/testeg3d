@@ -20,11 +20,19 @@ processit_msgs
 processit_core
 )
 
-find_package(PCL 1.12 REQUIRED)
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+# find_package(PCL 1.12 REQUIRED)
+# link_directories(${PCL_LIBRARY_DIRS})
+# add_definitions(${PCL_DEFINITIONS})
 
 find_package(OpenMP REQUIRED)
+
+if(OPENMP_FOUND)
+  message(STATUS "OpenMP found")
+  set(OpenMP_FLAGS ${OpenMP_CXX_FLAGS})
+  set(OpenMP_LIBS gomp)
+endif()
+  
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -115,13 +123,13 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include
+ INCLUDE_DIRS "include" "dependencies/include"
  LIBRARIES feature_line_tracing_test
  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs
                 pcl_ros roscpp rospy
                 std_msgs tf2_ros tf2_sensor_msgs
                 processit_msgs processit_core message_runtime
- DEPENDS PCL
+  DEPENDS OpenMP
 )
 
 ###########
@@ -132,9 +140,8 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  src/EG3D
+  dependencies/include
   ${catkin_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -150,7 +157,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(ScanProcessor src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG3D/EdgeCloud.cpp src/EG3D/RawCloud.cpp src/EG3D/BoundingBox.cpp src/EG3D/Region2D.cpp)
+add_executable(ScanProcessor src/ScanProcessor.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -160,13 +167,14 @@ add_executable(ScanProcessor src/ScanProcessor.cpp src/EG3D/BaseCloud.cpp src/EG
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
+target_compile_options(ScanProcessor PRIVATE ${OpenMP_FLAGS})
 add_dependencies(ScanProcessor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_include_directories(ScanProcessor PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(ScanProcessor PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/dependencies/include)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ScanProcessor
-  PUBLIC ${catkin_LIBRARIES} PUBLIC ${PCL_LIBRARIES} PUBLIC OpenMP::OpenMP_CXX
+target_link_libraries(ScanProcessor PRIVATE "${PROJECT_SOURCE_DIR}/dependencies/lib/libeg3d.a"
+  PUBLIC ${catkin_LIBRARIES} PUBLIC OpenMP::OpenMP_CXX ${OpenMP_LIBS}
 )
 # add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages.cpp)
 
