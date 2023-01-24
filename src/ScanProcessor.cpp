@@ -15,6 +15,11 @@ void ScanProcessor::initSubscribers() {
 
 }
 
+void ScanProcessor::ClearCloud() {
+    pcl::PointCloud<pcl::PointXYZ> empty_cloud;
+    empty_cloud.clear();
+    pcl::toPCLPointCloud2(empty_cloud, *raw_cl2);
+}
 void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
 
     Eigen::Vector3f current_vec = getDirectionVector(cloud_data);
@@ -69,11 +74,10 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
             ROS_INFO("Saved segments");
             // ros::shutdown();
         }
-        
+        ClearCloud();
+        ROS_INFO_STREAM("Cloud size after clear: " << raw_cl2->height * raw_cl2->width << std::endl);
         dir_vec.setZero(3);
         raw_cloud_count = 0;
-
-        raw_cloud_count++;
 
     }
 }

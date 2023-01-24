@@ -22,6 +22,7 @@ private:
     EdgeCloud edge_cloud;
 
     static Eigen::Vector3f getDirectionVector(const testeg3d::CloudData &cloud_data);
+    void ClearCloud();
 
 public:
     ScanProcessor(ros::NodeHandle* nh);
