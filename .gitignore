@@ -1,3 +1,4 @@
 .vscode/
 data/segments.pcd
 data/edge_points.pcd
+.vscode/c_cpp_properties.json
