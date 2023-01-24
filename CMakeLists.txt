@@ -123,7 +123,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS "include" "dependencies/include"
+ INCLUDE_DIRS "include"
  LIBRARIES feature_line_tracing_test
  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs
                 pcl_ros roscpp rospy
@@ -140,7 +140,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  dependencies/include
+  "/usr/local/include"
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -170,10 +170,10 @@ add_executable(ScanProcessor src/ScanProcessor.cpp)
 target_compile_options(ScanProcessor PRIVATE ${OpenMP_FLAGS})
 add_dependencies(ScanProcessor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_include_directories(ScanProcessor PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/dependencies/include)
+target_include_directories(ScanProcessor PRIVATE ${PROJECT_SOURCE_DIR}/include "/usr/local/include")
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ScanProcessor PRIVATE "${PROJECT_SOURCE_DIR}/dependencies/lib/libeg3d.a"
+target_link_libraries(ScanProcessor PUBLIC "/usr/local/lib/libeg3d.a"
   PUBLIC ${catkin_LIBRARIES} PUBLIC OpenMP::OpenMP_CXX ${OpenMP_LIBS}
 )
 # add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages.cpp)
