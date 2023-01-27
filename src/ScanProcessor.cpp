@@ -59,9 +59,9 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         ROS_INFO("Appended edge points");
         edge_cloud.ComputeVectors(50, 0.01, false);
         ROS_INFO("Computed point vectors");
-        edge_cloud.RemoveFalseEdges(0.01);
+        edge_cloud.RemoveFalseEdges(0.002);
         ROS_INFO("Tagged false edges");
-        edge_cloud.ApplyRegionGrowing(50, 20.0 / 180.0 * M_PI, true);
+        edge_cloud.ApplyRegionGrowing(30, 10.0 / 180.0 * M_PI, true);
         ROS_INFO("Segmented edges");
 
         if (cloud_data.last)
@@ -75,7 +75,6 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
             // ros::shutdown();
         }
         ClearCloud();
-        ROS_INFO_STREAM("Cloud size after clear: " << raw_cl2->height * raw_cl2->width << std::endl);
         dir_vec.setZero(3);
         raw_cloud_count = 0;
 
