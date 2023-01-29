@@ -25,8 +25,10 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
     Eigen::Vector3f current_vec = getDirectionVector(cloud_data);
     // ROS_INFO("Calculated direction vector");
     pcl::PCLPointCloud2::Ptr new_input (new pcl::PCLPointCloud2);
+    int n = static_cast<int>(0.004/cloud_data.gap);
+    ROS_INFO_ONCE("No. of scans needed: %i", n);
     pcl_conversions::toPCL(cloud_data.cloud, *new_input);
-    if (raw_cloud_count < 150 && !cloud_data.last)
+    if (raw_cloud_count < n && !cloud_data.last)
     {
         *raw_cl2 += *new_input;
         // ROS_INFO_STREAM("Raw cloud size: " << raw_cl2->height * raw_cl2->width);
@@ -47,7 +49,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         // pcl::io::savePCDFileASCII("/home/chl-es/TestEG3D/src/testeg3d/data/raw_cloud.pcd", *raw_cl1);
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl1);
-        raw_cloud.StatOutlierRemoval(50, 0.01);
+        // raw_cloud.StatOutlierRemoval(50, 0.01);
         raw_cloud.VoxelDownSample(0.0001f);
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
@@ -59,7 +61,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         ROS_INFO("Appended edge points");
         edge_cloud.ComputeVectors(50, 0.01, false);
         ROS_INFO("Computed point vectors");
-        edge_cloud.RemoveFalseEdges(0.002);
+        edge_cloud.RemoveFalseEdges(0.001);
         ROS_INFO("Tagged false edges");
         edge_cloud.ApplyRegionGrowing(30, 10.0 / 180.0 * M_PI, true);
         ROS_INFO("Segmented edges");

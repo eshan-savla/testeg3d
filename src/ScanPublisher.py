@@ -20,6 +20,14 @@ class PCLGenerator:
     def is_exhausted(self):
         return self.__is_exhausted 
 
+    def get_scan_gap(self):
+        scans = self.filedata[1]
+        point1 = scans[0]["tfToWorld"][0]
+        point2 = scans[1]["tfToWorld"][0]
+        gap = np.asarray(point2-point1)
+        return np.linalg.norm(gap)
+
+
     def save_pcl(self):
         cwd = os.getcwd()
         # rospy.logdebug(f"Current directory: {cwd}")
@@ -81,20 +89,23 @@ def publisher(test: bool = False):
     generator = virtual_pcl.generate()
     i = 0
     first = True
+    gap = virtual_pcl.get_scan_gap()
     while not rospy.is_shutdown() and not virtual_pcl.is_exhausted():
         pub_data = PointCloud2()
         data: np.ndarray = next(generator)
         points = data["cloud"]
         msg = CloudData()
+        msg.gap = gap
         point_vector = data["tfToWorld"][0]
+        msg.sensor_position = point_vector
         quaternion = data["tfToWorld"][1]
         rot = R.from_quat(quaternion)
         vec_z = rot.apply(np.array([0, 0, 1]))
-        msg.sensor_z = point_vector + vec_z
+        msg.sensor_z = vec_z
         vec_y = rot.apply(np.array([0, 1, 0]))
-        msg.sensor_y = point_vector + vec_y
+        msg.sensor_y = vec_y
         vec_x = rot.apply(np.array([1, 0, 0]))
-        msg.sensor_x = point_vector + vec_x
+        msg.sensor_x = vec_x
 
         msg.first = False
         msg.last = False
