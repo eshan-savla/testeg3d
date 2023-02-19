@@ -16,12 +16,15 @@ private:
     ros::NodeHandle nh;
     bool valid;
     int raw_cloud_count;
-    std::vector<std::size_t> first_ind, last_ind, reuse_ind;
+    std::vector<int> first_ind, last_ind, reuse_ind_start, reuse_ind_end;
     std::vector<unsigned int> segment_sizes;
     ros::Subscriber cloud_data_sub;
     pcl::PCLPointCloud2::Ptr raw_cl2;
     pcl::PCLPointCloud2::Ptr reuse_cl2;
-    Eigen::Vector3f dir_vec;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr raw_cl, reuse_cl;
+    Eigen::Vector3f dir_vec, reuse_vec;
+    pcl::VoxelGrid<pcl::PointXYZ> vg_sampler;
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> outrem;
     EdgeCloud edge_cloud;
     testeg3d::CloudData first_message, last_message, reuse_message;
 

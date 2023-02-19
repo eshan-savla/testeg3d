@@ -37,7 +37,7 @@ class PCLGenerator:
         points = np.concatenate(points, axis=0)
         pcl = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
         rospy.logwarn(f"Number of points in pointcloud: {len(pcl.points)}")
-        # o3d.io.write_point_cloud("/home/chl-es/before_filter.pcd", pcl)
+        o3d.io.write_point_cloud("/home/eshan/TestEG3D/src/testeg3d/data/before_filter.pcd", pcl)
         rospy.logdebug("Wrote unfiltered pointcloud file")
 
     def generate(self):

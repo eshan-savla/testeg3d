@@ -170,7 +170,7 @@ add_executable(ScanProcessor src/ScanProcessor.cpp)
 target_compile_options(ScanProcessor PRIVATE ${OpenMP_FLAGS})
 add_dependencies(ScanProcessor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_include_directories(ScanProcessor PRIVATE ${PROJECT_SOURCE_DIR}/include "/usr/local/include")
+target_include_directories(ScanProcessor PRIVATE ${PROJECT_SOURCE_DIR}/include "/usr/local/include/EG3D/")
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ScanProcessor PUBLIC "/usr/local/lib/libeg3d.a"
