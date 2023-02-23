@@ -9,7 +9,7 @@ ScanProcessor::ScanProcessor(ros::NodeHandle* nh) : nh(*nh),raw_cl2(new pcl::PCL
     raw_cloud_count = 0;
     edge_cloud.SetSensorSpecs(0.0, 0.290, 0.460);
     edge_cloud.SetDownsampling(false);
-    edge_cloud.SetStatOutRem(true);
+    edge_cloud.SetStatOutRem(true, 50, 1.5);
     raw_cl->clear();
     float leaf_size = 0.0001f;
     vg_sampler.setLeafSize(leaf_size, leaf_size, leaf_size);
@@ -29,7 +29,7 @@ void ScanProcessor::ClearCloud(pcl::PCLPointCloud2::Ptr &cloud2) {
     empty_cloud.clear();
     pcl::toPCLPointCloud2(empty_cloud, *cloud2);
 }
-void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
+void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
 
     Eigen::Vector3f current_vec = getDirectionVector(cloud_data);
     // ROS_INFO("Calculated direction vector");
@@ -98,7 +98,7 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl);
         raw_cloud.SetDownSample(true, 0.0001f);
-        raw_cloud.SetStatOutRem(true, 20, 1.0);
+        raw_cloud.SetStatOutRem(false, 10, 1.2);
         raw_cloud.SetFirstInd(first_ind);
         raw_cloud.SetLastInd(last_ind);
         // pcl::PointCloud<pcl::PointXYZ> cl;
@@ -115,7 +115,6 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
         *edges = raw_cloud.FindEdgePoints(200, M_PI_2);
-        raw_cloud.CorrectIndices(reuse_ind_start);
         raw_cloud.CorrectIndices(reuse_ind_end);
         // pcl::PointCloud<pcl::PointXYZ>::Ptr reuse_cl_start (new pcl::PointCloud<pcl::PointXYZ>);
         // pcl::PointCloud<pcl::PointXYZ>::Ptr reuse_cl_end (new pcl::PointCloud<pcl::PointXYZ>);
@@ -131,11 +130,11 @@ void ScanProcessor::msgCallBack(const testeg3d::CloudData& cloud_data) {
         edge_cloud.SetEndIndices(reuse_ind_end);
         edge_cloud.AddPoints(edges);
         ROS_INFO("Appended edge points");
-        edge_cloud.ComputeVectors(30, 0.01, false);
+        edge_cloud.ComputeVectors(20, 0.01, false);
         ROS_INFO("Computed point vectors");
         // edge_cloud.RemoveFalseEdges(0.001, true);
         // ROS_INFO("Tagged false edges");
-        edge_cloud.ApplyRegionGrowing(30, 11.0 / 180.0 * M_PI, true);
+        edge_cloud.ApplyRegionGrowing(20, 11.0 / 180.0 * M_PI, false);
         ROS_INFO("Segmented edges");
 
         if (cloud_data.last)
