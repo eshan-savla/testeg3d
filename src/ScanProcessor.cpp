@@ -9,12 +9,10 @@ ScanProcessor::ScanProcessor(ros::NodeHandle* nh) : nh(*nh),raw_cl2(new pcl::PCL
     raw_cloud_count = 0;
     edge_cloud.SetSensorSpecs(0.0, 0.290, 0.460);
     edge_cloud.SetDownsampling(false);
-    edge_cloud.SetStatOutRem(true, 50, 1.5);
+    edge_cloud.SetStatOutRem(true, 50, 1.2);
     raw_cl->clear();
     float leaf_size = 0.0001f;
     vg_sampler.setLeafSize(leaf_size, leaf_size, leaf_size);
-    outrem.setMeanK(20);
-    outrem.setStddevMulThresh(1.0);
     initSubscribers();
 } 
 
@@ -98,35 +96,21 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl);
         raw_cloud.SetDownSample(true, 0.0001f);
-        raw_cloud.SetStatOutRem(false, 10, 1.2);
+        raw_cloud.SetStatOutRem(true, 50, 1.5);
         raw_cloud.SetFirstInd(first_ind);
         raw_cloud.SetLastInd(last_ind);
-        // pcl::PointCloud<pcl::PointXYZ> cl;
-        // pcl::copyPointCloud(*raw_cl, last_ind, cl);
-        // pcl::io::savePCDFileASCII("/home/eshan/TestEG3D/src/testeg3d/data/last_inds.pcd", cl);
-        // if(cloud_data.first)
-        //     raw_cloud.SetFilterCriteria(false, true);
-        // else if(cloud_data.last)
-        //     raw_cloud.SetFilterCriteria(true, false);
-        // else
+        raw_cloud.SetReuseInd(reuse_ind_end);
         raw_cloud.SetFilterCriteria(true, true);
         // raw_cloud.VoxelDownSample(0.0001f);
         // raw_cloud.StatOutlierRemoval(20, 1.0);
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
         *edges = raw_cloud.FindEdgePoints(200, M_PI_2);
-        raw_cloud.CorrectIndices(reuse_ind_end);
-        // pcl::PointCloud<pcl::PointXYZ>::Ptr reuse_cl_start (new pcl::PointCloud<pcl::PointXYZ>);
-        // pcl::PointCloud<pcl::PointXYZ>::Ptr reuse_cl_end (new pcl::PointCloud<pcl::PointXYZ>);
-        // pcl::copyPointCloud(*edges, reuse_ind_start, *reuse_cl_start);
-        // pcl::copyPointCloud(*edges, reuse_ind_end, *reuse_cl_end);
-        // pcl::io::savePCDFileASCII("/home/eshan/TestEG3D/src/testeg3d/data/reuse_cl_start.pcd", *reuse_cl_start);
-        // pcl::io::savePCDFileASCII("/home/eshan/TestEG3D/src/testeg3d/data/reuse_cl_end.pcd", *reuse_cl_end);
+        reuse_ind_end = raw_cloud.GetReuseInd();
         ROS_INFO("Calculated edge points");
-        pcl::io::savePCDFileASCII("/home/eshan/TestEG3D/src/testeg3d/data/edge_points.pcd", *edges);
         edge_cloud.SetScanDirection(dir_vec);
-        edge_cloud.SetSensorCoords(first_message.sensor_x, first_message.sensor_y, first_message.sensor_z, first_message.sensor_position, "first");
-        edge_cloud.SetSensorCoords(last_message.sensor_x, last_message.sensor_y, last_message.sensor_z, last_message.sensor_position, "last");
+        // edge_cloud.SetSensorCoords(first_message.sensor_x, first_message.sensor_y, first_message.sensor_z, first_message.sensor_position, "first");
+        // edge_cloud.SetSensorCoords(last_message.sensor_x, last_message.sensor_y, last_message.sensor_z, last_message.sensor_position, "last");
         edge_cloud.SetEndIndices(reuse_ind_end);
         edge_cloud.AddPoints(edges);
         ROS_INFO("Appended edge points");
