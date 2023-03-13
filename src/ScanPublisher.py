@@ -11,8 +11,9 @@ from testeg3d.msg import CloudData
 from scipy.spatial.transform import Rotation as R
 
 class PCLGenerator:
-    def __init__(self, file, test: bool = False):
+    def __init__(self, file, file_type:str, test: bool = False):
         self.filedata = np.load(file, allow_pickle=True)
+        self.file_type = file_type
         self.test = test
         self.__is_exhausted = False
         self.save_pcl()
@@ -22,8 +23,12 @@ class PCLGenerator:
 
     def get_scan_gap(self):
         scans = self.filedata[1]
-        point1 = scans[0]["tfToWorld"][0]
-        point2 = scans[1]["tfToWorld"][0]
+        if(self.file_type == "old"):
+            point1 = scans[0]["tfToWorld"][0]
+            point2 = scans[1]["tfToWorld"][0]
+        elif(self.file_type == "new"):
+            point1 = scans[0]["tf_to_world"].asTuple()[0]
+            point2 = scans[1]["tf_to_world"].asTuple()[0]
         gap = np.asarray(point2-point1)
         return np.linalg.norm(gap)
 
@@ -77,15 +82,15 @@ def arrayToPointcloud2(array, frame_id: str, timestamp=[]) -> PointCloud2:
     pcl2 = pc2.create_cloud_xyz32(header, array)
     return pcl2
 
-def publisher(test: bool = False):
+def publisher(file_type: str, test: bool = False):
     pub = rospy.Publisher('LaserValues', CloudData, queue_size=1000)
     rospy.loginfo("Created Publisher")
     rospy.init_node('laser_publisher', log_level=rospy.DEBUG)
     rospy.loginfo("Node initialized")
     rospy.on_shutdown(PCLGenerator.on_shutdown)
     rate = rospy.Rate(10)
-    file = "/home/eshan/TestEG3D/src/testeg3d/data/scan_211115_163654.npy"
-    virtual_pcl = PCLGenerator(file, test=test)
+    file = "/media/eshan/Eshans Stic/Scans/scan_230228-100944_fillet_inside.npy"
+    virtual_pcl = PCLGenerator(file, file_type, test=test)
     generator = virtual_pcl.generate()
     i = 0
     first = True
@@ -96,9 +101,13 @@ def publisher(test: bool = False):
         points = data["cloud"]
         msg = CloudData()
         msg.gap = gap
-        point_vector = data["tfToWorld"][0]
+        if(file_type == "old"):
+            point_vector = data["tfToWorld"][0]
+            quaternion = data["tfToWorld"][1]
+        elif(file_type == "new"):
+            point_vector = data["tf_to_world"].asTuple()[0]
+            quaternion = data["tf_to_world"].asTuple()[1]
         msg.sensor_position = point_vector
-        quaternion = data["tfToWorld"][1]
         rot = R.from_quat(quaternion)
         vec_z = rot.apply(np.array([0, 0, 1]))
         msg.sensor_z = vec_z
@@ -129,6 +138,6 @@ def publisher(test: bool = False):
 
 if __name__ == "__main__":
     try:
-        publisher()
+        publisher("new")
     except rospy.ROSInterruptException:
         rospy.logwarn("Kernel interrupted. Shutting publisher down")

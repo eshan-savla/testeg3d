@@ -37,6 +37,12 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
     // int n = 1195;
     int reuse_count = static_cast<int>(0.0008/cloud_data.gap);
     int false_seg_count = static_cast<int>(0.0001/cloud_data.gap);
+    if (false_seg_count < 4)
+    {
+        false_seg_count += 4 - false_seg_count;
+        reuse_count += 4 - false_seg_count;
+    }
+
     ROS_INFO_ONCE("No. of scans needed: %i", n);
     pcl_conversions::toPCL(cloud_data.cloud, *new_input_cl2);
     pcl::fromPCLPointCloud2(*new_input_cl2, *new_input);
