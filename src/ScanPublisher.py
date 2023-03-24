@@ -16,7 +16,6 @@ class PCLGenerator:
         self.file_type = file_type
         self.test = test
         self.__is_exhausted = False
-        self.save_pcl()
 
     def is_exhausted(self):
         return self.__is_exhausted 
@@ -46,7 +45,10 @@ class PCLGenerator:
         rospy.logdebug("Wrote unfiltered pointcloud file")
 
     def generate(self):
-        scans = self.filedata[1]
+        if self.file_type != "ground_truth":
+            scans = self.filedata[1]
+        else:
+            scans = self.filedata
         sum = 0
         for i in tqdm(range(len(scans)), desc="Scan progress"):
             # pos, ori = scan['tfToSensor']
@@ -98,24 +100,34 @@ def publisher(file_type: str, test: bool = False):
     while not rospy.is_shutdown() and not virtual_pcl.is_exhausted():
         pub_data = PointCloud2()
         data: np.ndarray = next(generator)
-        points = data["cloud"]
         msg = CloudData()
-        msg.gap = gap
-        if(file_type == "old"):
-            point_vector = data["tfToWorld"][0]
-            quaternion = data["tfToWorld"][1]
-        elif(file_type == "new"):
-            point_vector = data["tf_to_world"].asTuple()[0]
-            quaternion = data["tf_to_world"].asTuple()[1]
-        msg.sensor_position = point_vector
-        rot = R.from_quat(quaternion)
-        vec_z = rot.apply(np.array([0, 0, 1]))
-        msg.sensor_z = vec_z
-        vec_y = rot.apply(np.array([0, 1, 0]))
-        msg.sensor_y = vec_y
-        vec_x = rot.apply(np.array([1, 0, 0]))
-        msg.sensor_x = vec_x
+        if file_type != "ground_truth":
+            points = data["cloud"]
+            msg.gap = gap
+            if(file_type == "old"):
+                point_vector = data["tfToWorld"][0]
+                quaternion = data["tfToWorld"][1]
+            elif(file_type == "new"):
+                point_vector = data["tf_to_world"].asTuple()[0]
+                quaternion = data["tf_to_world"].asTuple()[1]
+            msg.sensor_position = point_vector
+            rot = R.from_quat(quaternion)
+            vec_z = rot.apply(np.array([0, 0, 1]))
+            
+            vec_y = rot.apply(np.array([0, 1, 0]))
+            
+            vec_x = rot.apply(np.array([1, 0, 0]))
+        else:
+            msg.gap = 0.001
+            msg.sensor_position = [0, 0, 0]
+            vec_x = [1, 0, 0]
+            vec_y = [0, 1, 0]
+            vec_z = [0, 0, 1]
+            points = data
 
+        msg.sensor_x = vec_x
+        msg.sensor_y = vec_y
+        msg.sensor_z = vec_z
         msg.first = False
         msg.last = False
         if first:
@@ -123,8 +135,6 @@ def publisher(file_type: str, test: bool = False):
             first = False
         if virtual_pcl.is_exhausted():
             msg.last = True
-        points_shape = points.shape
-        first_points = points[0, :]
         msg.cloud = arrayToPointcloud2(points, "sensor", rospy.Time.now())
         # rospy.loginfo(f"Publishing data with first points: {first_points} and shape {points_shape}")
         rospy.logwarn_once(f"Publish started at: {rospy.get_time()}")
