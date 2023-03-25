@@ -91,12 +91,13 @@ def publisher(file_type: str, test: bool = False):
     rospy.loginfo("Node initialized")
     rospy.on_shutdown(PCLGenerator.on_shutdown)
     rate = rospy.Rate(10)
-    file = "/media/eshan/Eshans Stic/Scans/scan_230228-100944_fillet_inside.npy"
+    file = "/home/eshan/TestEG3D/src/testeg3d/data/ground_truth.npy"
     virtual_pcl = PCLGenerator(file, file_type, test=test)
     generator = virtual_pcl.generate()
     i = 0
     first = True
-    gap = virtual_pcl.get_scan_gap()
+    if file_type != "ground_truth":
+        gap = virtual_pcl.get_scan_gap()
     while not rospy.is_shutdown() and not virtual_pcl.is_exhausted():
         pub_data = PointCloud2()
         data: np.ndarray = next(generator)
@@ -118,7 +119,7 @@ def publisher(file_type: str, test: bool = False):
             
             vec_x = rot.apply(np.array([1, 0, 0]))
         else:
-            msg.gap = 0.001
+            msg.gap = 0.0001
             msg.sensor_position = [0, 0, 0]
             vec_x = [1, 0, 0]
             vec_y = [0, 1, 0]
@@ -148,6 +149,6 @@ def publisher(file_type: str, test: bool = False):
 
 if __name__ == "__main__":
     try:
-        publisher("new")
+        publisher("ground_truth")
     except rospy.ROSInterruptException:
         rospy.logwarn("Kernel interrupted. Shutting publisher down")

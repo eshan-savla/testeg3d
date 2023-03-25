@@ -14,6 +14,7 @@ class ScanProcessor
 {
 private:
     ros::NodeHandle nh;
+    bool first;
     bool valid;
     int raw_cloud_count;
     std::vector<int> first_ind, last_ind, reuse_ind_start, reuse_ind_end;
