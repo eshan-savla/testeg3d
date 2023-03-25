@@ -4,10 +4,10 @@ import open3d as o3d
 
 def main():
     ground_truth = o3d.geometry.PointCloud()
-    y_dimension, x_dimension, z_dimension = 200, 100, 50
+    y_dimension, x_dimension, z_dimension = 2000, 1000, 500
     points = np.zeros((y_dimension, x_dimension + z_dimension, 3), dtype=np.float64)
     start_val = 0.01
-    step_size = 0.001
+    step_size = 0.0001
     z_const_val = start_val
     x_const_val = start_val + ((x_dimension / 2) * step_size)
     z_top_val = start_val + (z_dimension * step_size)
@@ -34,12 +34,12 @@ def main():
             point[2] = z
         y_count += 1
 
-    np.save("/home/chl-es/TestEG3D/src/testeg3d/data/ground_truth", points)
+    np.save("/home/eshan/TestEG3D/src/testeg3d/data/ground_truth", points)
     print("Wrote .npy file to ../data/ground_truth.npy")
     ground_truth.points = o3d.utility.Vector3dVector(np.concatenate(points, axis=0))
     print("Created point cloud with: ")
     print(ground_truth)
-    o3d.io.write_point_cloud("/home/chl-es/TestEG3D/src/testeg3d/data/ground_truth.pcd", ground_truth)
+    o3d.io.write_point_cloud("/home/eshan/TestEG3D/src/testeg3d/data/ground_truth.pcd", ground_truth)
     print(".pcd file created at ../data/ground_truth.pcd")
     return None
 
