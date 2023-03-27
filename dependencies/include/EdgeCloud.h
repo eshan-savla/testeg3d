@@ -73,12 +73,13 @@ private:
     void Init();
 
     int GrowSegment(const int &initial_seed, const int &segment_id, const int &neighbours_k, bool use_original = false);
-    bool CheckPoint(const Eigen::Vector3f &seed_vec, const Eigen::Vector3f &nghbr_vec, bool &is_a_seed) const;
+    bool CheckPoint(const int &current_seed, const int &neighbour, bool &is_a_seed);
     void ShiftIndices(std::vector<int> &indices);
     int ExtendSegments(const int neighbours_k);
     bool IsFinished(const int &label);
     void SpecialKNeighboursSearch(const std::size_t &point_index, int neighbours_k, std::vector<int> &neighbours_id, std::vector<float> &neighbours_dist);
     static std::pair<int, int> findEntryWithLargestValue(std::unordered_map<int, int> sampleMap);
+    void StoreClusterInfo(const unsigned long num_of_segs, const long num_of_unseg);
     
 public:
     /// @brief Empty Constructor
