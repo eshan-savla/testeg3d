@@ -46,7 +46,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
     ROS_INFO_ONCE("No. of scans needed: %i", n);
     pcl_conversions::toPCL(cloud_data.cloud, *new_input_cl2);
     pcl::fromPCLPointCloud2(*new_input_cl2, *new_input);
-    if (raw_cloud_count < n && !cloud_data.last) 
+    if (raw_cloud_count < n && !cloud_data.last)
     {
         if (raw_cloud_count == 0){
             first_message = cloud_data;
@@ -102,7 +102,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl);
         raw_cloud.SetDownSample(false, 0.0001f);
-        raw_cloud.SetStatOutRem(false, 50, 1.5);
+        raw_cloud.SetStatOutRem(false, 50, 1.0);
         raw_cloud.SetFirstInd(first_ind);
         raw_cloud.SetLastInd(last_ind);
         raw_cloud.SetReuseInd(reuse_ind_end);
@@ -128,11 +128,11 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         edge_cloud.SetEndIndices(reuse_ind_end);
         edge_cloud.AddPoints(edges);
         ROS_INFO("Appended edge points");
-        edge_cloud.ComputeVectors(30, 0.001, false);
+        edge_cloud.ComputeVectors(30, 0.0005, false);
         ROS_INFO("Computed point vectors");
         // edge_cloud.RemoveFalseEdges(0.001, true);
         // ROS_INFO("Tagged false edges");
-        edge_cloud.ApplyRegionGrowing(30, 11.0 / 180.0 * M_PI, false);
+        edge_cloud.ApplyRegionGrowing(30, 11.0 / 180.0 * M_PI, true);
         ROS_INFO("Segmented edges");
 
         if (cloud_data.last)
