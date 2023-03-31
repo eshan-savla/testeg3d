@@ -16,8 +16,6 @@ message_generation
 std_msgs
 tf2_ros
 tf2_sensor_msgs
-processit_msgs
-processit_core
 )
 
 # find_package(PCL 1.12 REQUIRED)
@@ -123,12 +121,12 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS "include"
+ INCLUDE_DIRS "include" "/usr/local/include/EG3D/"
  LIBRARIES feature_line_tracing_test
  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs
                 pcl_ros roscpp rospy
                 std_msgs tf2_ros tf2_sensor_msgs
-                processit_msgs processit_core message_runtime
+                message_runtime
   DEPENDS OpenMP
 )
 
@@ -140,7 +138,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  "/usr/local/include"
+  "/usr/local/include/EG3D/"
   ${catkin_INCLUDE_DIRS}
 )
 
