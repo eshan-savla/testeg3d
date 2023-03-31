@@ -7,7 +7,6 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_ros/point_cloud.h>
 #include <sensor_msgs/LaserScan.h>
-#include <processit_msgs/ScanData.h>
 #include <testeg3d/CloudData.h>
 
 class ScanProcessor
@@ -17,6 +16,7 @@ private:
     bool first;
     bool valid;
     int raw_cloud_count;
+    double cloud_gap_count, cloud_gap_reuse;
     std::vector<int> first_ind, last_ind, reuse_ind_start, reuse_ind_end;
     std::vector<unsigned int> segment_sizes;
     ros::Subscriber cloud_data_sub;

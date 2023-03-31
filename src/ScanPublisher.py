@@ -56,9 +56,19 @@ class PCLGenerator:
             if i >= (len(scans) - 1):
                 self.__is_exhausted = True
             data = scans[i]
+            if i == 0:
+                if(self.file_type == "old"):
+                    gap = scans[i + 1]["tfToWorld"][0] - scans[i]["tfToWorld"][0]
+                else:
+                    gap = scans[i + 1]["tf_to_world"].asTuple()[0] - scans[i]["tf_to_world"].asTuple()[0]
+            else:
+                if(self.file_type == "old"):
+                    gap = scans[i]["tfToWorld"][0] - scans[i-1]["tfToWorld"][0]
+                else:
+                    gap = scans[i]["tf_to_world"].asTuple()[0] - scans[i-1]["tf_to_world"].asTuple()[0]
             if self.test and sum >= 11:
                 break
-            yield data
+            yield data, gap
             sum += 1
 
     @staticmethod
@@ -91,7 +101,7 @@ def publisher(file_type: str, test: bool = False):
     rospy.loginfo("Node initialized")
     rospy.on_shutdown(PCLGenerator.on_shutdown)
     rate = rospy.Rate(10)
-    file = "/home/eshan/TestEG3D/src/testeg3d/data/ground_truth.npy"
+    file = "/home/eshan/TestEG3D/src/testeg3d/data/scan_211115_163654.npy"
     virtual_pcl = PCLGenerator(file, file_type, test=test)
     generator = virtual_pcl.generate()
     i = 0
@@ -100,11 +110,12 @@ def publisher(file_type: str, test: bool = False):
         gap = virtual_pcl.get_scan_gap()
     while not rospy.is_shutdown() and not virtual_pcl.is_exhausted():
         pub_data = PointCloud2()
-        data: np.ndarray = next(generator)
+        data, gap = next(generator)
         msg = CloudData()
         if file_type != "ground_truth":
             points = data["cloud"]
-            msg.gap = gap
+            points_gap = (points[-1] - points[0])/len(points)
+            msg.gap = (gap + points_gap)/2
             if(file_type == "old"):
                 point_vector = data["tfToWorld"][0]
                 quaternion = data["tfToWorld"][1]
@@ -119,7 +130,7 @@ def publisher(file_type: str, test: bool = False):
             
             vec_x = rot.apply(np.array([1, 0, 0]))
         else:
-            msg.gap = 0.0001
+            msg.gap = 0.00025
             msg.sensor_position = [0, 0, 0]
             vec_x = [1, 0, 0]
             vec_y = [0, 1, 0]

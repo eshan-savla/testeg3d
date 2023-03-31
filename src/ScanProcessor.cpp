@@ -34,20 +34,23 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
     // ROS_INFO("Calculated direction vector");
     pcl::PCLPointCloud2::Ptr new_input_cl2 (new pcl::PCLPointCloud2);
     pcl::PointCloud<pcl::PointXYZ>::Ptr new_input (new pcl::PointCloud<pcl::PointXYZ>);
-    int n = static_cast<int>(0.01/cloud_data.gap) - 1;
+    int n = static_cast<int>(0.00025 * 80/cloud_data.gap);
     // int n = 1195;
-    int reuse_count = static_cast<int>(0.001/cloud_data.gap);
-    int false_seg_count = static_cast<int>(0.0002/cloud_data.gap);
+    int reuse_count = static_cast<int>(0.00025 *20/cloud_data.gap);
+    int false_seg_count = static_cast<int>(0.00025 * 2/cloud_data.gap);
     if (false_seg_count < 2)
     {
         false_seg_count += 2 - false_seg_count;
         reuse_count += 2 - false_seg_count;
     }
     ROS_INFO_ONCE("No. of scans needed: %i", n);
+    ROS_INFO_ONCE("Reuse count: %i", reuse_count);
+    ROS_INFO_ONCE("False segments count: %i", false_seg_count);
     pcl_conversions::toPCL(cloud_data.cloud, *new_input_cl2);
     pcl::fromPCLPointCloud2(*new_input_cl2, *new_input);
     if (raw_cloud_count < n && !cloud_data.last)
     {
+        cloud_gap_count += cloud_data.gap;
         if (raw_cloud_count == 0){
             first_message = cloud_data;
         }
@@ -62,6 +65,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
             reuse_message = cloud_data;
             reuse_vec += current_vec;
             *reuse_cl += *new_input;
+            cloud_gap_reuse += cloud_data.gap;
         }
         raw_cloud_count++;
     }
@@ -99,6 +103,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         std::iota(last_ind.begin(), last_ind.end(),raw_cl->size() - last_size);
         std::iota(reuse_ind_start.begin(), reuse_ind_start.end(), 0);
         std::iota(reuse_ind_end.begin(),reuse_ind_end.end(), raw_cl->size() - reuse_size_end);
+        double avg_cloud_gap = cloud_gap_count / n;
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl);
         raw_cloud.SetDownSample(false, 0.0001f);
@@ -118,7 +123,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         // raw_cloud.StatOutlierRemoval(20, 1.0);
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
-        *edges = raw_cloud.FindEdgePoints(200, M_PI_2, 0.0001);
+        *edges = raw_cloud.FindEdgePoints(200, M_PI_2, avg_cloud_gap);
         reuse_ind_end = raw_cloud.GetReuseInd();
         ROS_INFO("Calculated edge points");
         pcl::io::savePCDFileASCII("/home/eshan/TestEG3D/src/testeg3d/data/edge_points.pcd", *edges);
@@ -128,7 +133,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         edge_cloud.SetEndIndices(reuse_ind_end);
         edge_cloud.AddPoints(edges);
         ROS_INFO("Appended edge points");
-        edge_cloud.ComputeVectors(30, 0.0005, false);
+        edge_cloud.ComputeVectors(30, avg_cloud_gap*3, false);
         ROS_INFO("Computed point vectors");
         // edge_cloud.RemoveFalseEdges(0.001, true);
         // ROS_INFO("Tagged false edges");
@@ -151,6 +156,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         dir_vec += reuse_vec;
         reuse_vec.setZero(3);
         raw_cloud_count = reuse_count;
+        cloud_gap_count = cloud_gap_reuse;
         // first_message = reuse_message;
         segment_sizes.erase(segment_sizes.begin(), segment_sizes.end() - reuse_count);
     }
