@@ -22,7 +22,7 @@ private:
     ros::Subscriber cloud_data_sub;
     pcl::PCLPointCloud2::Ptr raw_cl2;
     pcl::PCLPointCloud2::Ptr reuse_cl2;
-    pcl::PointCloud<pcl::PointXYZ>::Ptr raw_cl, reuse_cl;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr raw_cl, reuse_cl, downsampled_cl;
     Eigen::Vector3f dir_vec, reuse_vec;
     pcl::VoxelGrid<pcl::PointXYZ> vg_sampler;
     pcl::StatisticalOutlierRemoval<pcl::PointXYZ> outrem;
