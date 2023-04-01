@@ -58,14 +58,18 @@ class PCLGenerator:
             data = scans[i]
             if i == 0:
                 if(self.file_type == "old"):
-                    gap = scans[i + 1]["tfToWorld"][0] - scans[i]["tfToWorld"][0]
+                    gap = np.linalg.norm(np.asarray(scans[i + 1]["tfToWorld"][0] - scans[i]["tfToWorld"][0]))
+                elif(self.file_type == "new"):
+                    gap = np.linalg.norm(np.asarray(scans[i + 1]["tf_to_world"].asTuple()[0] - scans[i]["tf_to_world"].asTuple()[0]))
                 else:
-                    gap = scans[i + 1]["tf_to_world"].asTuple()[0] - scans[i]["tf_to_world"].asTuple()[0]
+                    gap = None
             else:
                 if(self.file_type == "old"):
-                    gap = scans[i]["tfToWorld"][0] - scans[i-1]["tfToWorld"][0]
+                    gap = np.linalg.norm(np.asarray(scans[i]["tfToWorld"][0] - scans[i-1]["tfToWorld"][0]))
+                elif(self.file_type == "new"):
+                    gap = np.linalg.norm(np.asarray(scans[i]["tf_to_world"].asTuple()[0] - scans[i-1]["tf_to_world"].asTuple()[0]))
                 else:
-                    gap = scans[i]["tf_to_world"].asTuple()[0] - scans[i-1]["tf_to_world"].asTuple()[0]
+                    gap = None
             if self.test and sum >= 11:
                 break
             yield data, gap
@@ -114,7 +118,7 @@ def publisher(file_type: str, test: bool = False):
         msg = CloudData()
         if file_type != "ground_truth":
             points = data["cloud"]
-            points_gap = (points[-1] - points[0])/len(points)
+            points_gap = np.linalg.norm(np.asarray(points[-1] - points[0]))/len(points)
             msg.gap = (gap + points_gap)/2
             if(file_type == "old"):
                 point_vector = data["tfToWorld"][0]
@@ -160,6 +164,6 @@ def publisher(file_type: str, test: bool = False):
 
 if __name__ == "__main__":
     try:
-        publisher("ground_truth")
+        publisher("old")
     except rospy.ROSInterruptException:
         rospy.logwarn("Kernel interrupted. Shutting publisher down")
