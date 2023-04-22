@@ -38,5 +38,4 @@ public:
     void msgCallBack(const testeg3d::CloudData& cloud_data);
     pcl::PointCloud<pcl::PointXYZ> getEdgePoints(const sensor_msgs::PointCloud2Ptr cloud_in);
     pcl::PointCloud<pcl::PointXYZ> getSegments(const pcl::PointCloud<pcl::PointXYZ>& raw_cl2);
-    ~ScanProcessor();
 };

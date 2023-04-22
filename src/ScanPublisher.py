@@ -16,6 +16,7 @@ class PCLGenerator:
         self.file_type = file_type
         self.test = test
         self.__is_exhausted = False
+        self.save_pcl()
 
     def is_exhausted(self):
         return self.__is_exhausted 

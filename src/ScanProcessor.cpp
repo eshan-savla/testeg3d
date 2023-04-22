@@ -38,7 +38,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
     pcl::PointCloud<pcl::PointXYZ>::Ptr new_input (new pcl::PointCloud<pcl::PointXYZ>);
     int n = static_cast<int>(100);
     // int n = 1195;
-    int reuse_count = static_cast<int>(20);
+    int reuse_count = static_cast<int>(30);
     int false_seg_count = static_cast<int>(8);
     // if (false_seg_count < 2)
     // {
@@ -108,7 +108,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         ROS_INFO("segmenting edges");
         RawCloud raw_cloud;
         raw_cloud.LoadInCloud(raw_cl);
-        raw_cloud.SetDownSample(true, 0.0001f);
+        raw_cloud.SetDownSample(true, 0.0001);
         raw_cloud.SetStatOutRem(false, 50, 1.0);
         raw_cloud.SetFirstInd(first_ind);
         raw_cloud.SetLastInd(last_ind);
@@ -125,7 +125,7 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         // raw_cloud.StatOutlierRemoval(20, 1.0);
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
-        *edges = raw_cloud.FindEdgePoints(200, M_PI_2, 0.0001f);
+        *edges = raw_cloud.FindEdgePoints(200, M_PI_2, 0.0001);
         reuse_ind_end = raw_cloud.GetReuseInd();
         ROS_INFO("Calculated edge points");
         *downsampled_cl += raw_cloud.GetCloud();
@@ -136,11 +136,11 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         edge_cloud.SetEndIndices(reuse_ind_end);
         edge_cloud.AddPoints(edges);
         ROS_INFO("Appended edge points");
-        edge_cloud.ComputeVectors(30, 0.00025f, false);
+        edge_cloud.ComputeVectors(30, 0.0002, false);
         ROS_INFO("Computed point vectors");
         // edge_cloud.RemoveFalseEdges(0.001, true);
         // ROS_INFO("Tagged false edges");
-        edge_cloud.ApplyRegionGrowing(30, 11.0 / 180.0 * M_PI, true);
+        edge_cloud.ApplyRegionGrowing(30, 15.0 / 180.0 * M_PI, true);
         ROS_INFO("Segmented edges");
 
         if (cloud_data.last)
@@ -172,31 +172,12 @@ Eigen::Vector3f ScanProcessor::getDirectionVector(const testeg3d::CloudData &clo
     return scan_dir;
 }
 
-ScanProcessor::~ScanProcessor() {
-    edge_cloud.AssembleRegions();
-    edge_cloud.CreateColouredCloud("/home/chl-es/TestEG3D/src/testeg3d/data/segments.pcd");
-    ROS_INFO("Saved segmented cloud.");
-}
-
-void sigint_handler(int signum) {
-    ros::shutdown();
-    exit(signum);
-}
-
-
 int main(int argc, char ** argv) {
     ros::init(argc, argv, "scan_processor", ros::init_options::NoSigintHandler);
     ros::NodeHandle nh;
     ROS_INFO("Start scan processor node");
     ScanProcessor scan_processor(&nh);
-    signal(SIGINT, sigint_handler);
     while (ros::ok)
-    {
-            ros::spin();
-            if (ros::isShuttingDown)
-                scan_processor.~ScanProcessor();
-            
-
-    }    
+        ros::spin();           
     return 0;
 }
