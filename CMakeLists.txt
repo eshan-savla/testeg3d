@@ -16,6 +16,7 @@ message_generation
 std_msgs
 tf2_ros
 tf2_sensor_msgs
+processit_core
 )
 
 # find_package(PCL 1.12 REQUIRED)
@@ -126,7 +127,7 @@ catkin_package(
  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs
                 pcl_ros roscpp rospy
                 std_msgs tf2_ros tf2_sensor_msgs
-                message_runtime
+                message_runtime processit_core
   DEPENDS OpenMP
 )
 
