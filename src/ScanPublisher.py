@@ -24,7 +24,10 @@ class PCLGenerator:
     def get_scan_gap(self):
         scans = self.filedata[1]
         if(self.file_type == "old"):
-            point1 = scans[0]["tfToWorld"][0]
+            try:
+                point1 = scans[0]["tfToWorld"][0]
+            except(KeyError):
+                rospy.logerr('Using "new" file type for old file')
             point2 = scans[1]["tfToWorld"][0]
         elif(self.file_type == "new"):
             point1 = scans[0]["tf_to_world"].asTuple()[0]
@@ -59,9 +62,15 @@ class PCLGenerator:
             data = scans[i]
             if i == 0:
                 if(self.file_type == "old"):
-                    gap = np.linalg.norm(np.asarray(scans[i + 1]["tfToWorld"][0] - scans[i]["tfToWorld"][0]))
+                    try:
+                        gap = np.linalg.norm(np.asarray(scans[i + 1]["tfToWorld"][0] - scans[i]["tfToWorld"][0]))
+                    except(KeyError):
+                        print('Using "old" file type for other file type')
                 elif(self.file_type == "new"):
-                    gap = np.linalg.norm(np.asarray(scans[i + 1]["tf_to_world"].asTuple()[0] - scans[i]["tf_to_world"].asTuple()[0]))
+                    try:
+                        gap = np.linalg.norm(np.asarray(scans[i + 1]["tf_to_world"].asTuple()[0] - scans[i]["tf_to_world"].asTuple()[0]))
+                    except(KeyError):
+                        print('Using "new" file type for other file type')
                 else:
                     gap = None
             else:
@@ -106,26 +115,36 @@ def publisher(file_type: str, test: bool = False):
     rospy.loginfo("Node initialized")
     rospy.on_shutdown(PCLGenerator.on_shutdown)
     rate = rospy.Rate(10)
-    file = "/home/eshan/TestEG3D/src/testeg3d/data/scan_211115_163654.npy"
+    file = "/home/eshan/TestEG3D/src/testeg3d/data/ground_truth.npy"
     virtual_pcl = PCLGenerator(file, file_type, test=test)
     generator = virtual_pcl.generate()
     i = 0
     first = True
     if file_type != "ground_truth":
-        gap = virtual_pcl.get_scan_gap()
+        try:
+            gap = virtual_pcl.get_scan_gap()
+        except(IndexError):
+            print(('Using other file type for "ground truth" type'))
     while not rospy.is_shutdown() and not virtual_pcl.is_exhausted():
         pub_data = PointCloud2()
-        data, gap = next(generator)
+        data, gap_each = next(generator)
         msg = CloudData()
         if file_type != "ground_truth":
             points = data["cloud"]
             points_gap = np.linalg.norm(np.asarray(points[-1] - points[0]))/len(points)
-            msg.gap = (gap + points_gap)/2
+            msg.gap = (gap_each + points_gap)/2
+            msg.gap = gap
             if(file_type == "old"):
-                point_vector = data["tfToWorld"][0]
+                try:
+                    point_vector = data["tfToWorld"][0]
+                except(KeyError):
+                    print(('Using "old" file type for other file type'))
                 quaternion = data["tfToWorld"][1]
             elif(file_type == "new"):
-                point_vector = data["tf_to_world"].asTuple()[0]
+                try:
+                    point_vector = data["tf_to_world"].asTuple()[0]
+                except(KeyError):
+                    print(('Using "new" file type for other file type'))
                 quaternion = data["tf_to_world"].asTuple()[1]
             msg.sensor_position = point_vector
             rot = R.from_quat(quaternion)
@@ -165,6 +184,6 @@ def publisher(file_type: str, test: bool = False):
 
 if __name__ == "__main__":
     try:
-        publisher("old")
+        publisher("new")
     except rospy.ROSInterruptException:
         rospy.logwarn("Kernel interrupted. Shutting publisher down")

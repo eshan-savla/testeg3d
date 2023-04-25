@@ -36,10 +36,10 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
     // ROS_INFO("Calculated direction vector");
     pcl::PCLPointCloud2::Ptr new_input_cl2 (new pcl::PCLPointCloud2);
     pcl::PointCloud<pcl::PointXYZ>::Ptr new_input (new pcl::PointCloud<pcl::PointXYZ>);
-    int n = static_cast<int>(100);
+    int n = static_cast<int>(0.004/cloud_data.gap);
     // int n = 1195;
-    int reuse_count = static_cast<int>(30);
-    int false_seg_count = static_cast<int>(8);
+    int reuse_count = static_cast<int>(0.0008/cloud_data.gap);
+    int false_seg_count = static_cast<int>(0.0004/cloud_data.gap);
     // if (false_seg_count < 2)
     // {
     //     false_seg_count += 2 - false_seg_count;
@@ -121,8 +121,6 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
             raw_cloud.SetFilterCriteria(true, false);
         else
             raw_cloud.SetFilterCriteria(true, true);
-        // raw_cloud.VoxelDownSample(0.0001f);
-        // raw_cloud.StatOutlierRemoval(20, 1.0);
         ROS_INFO("Filtered raw cloud");
         pcl::PointCloud<pcl::PointXYZ>::Ptr edges (new pcl::PointCloud<pcl::PointXYZ>);
         *edges = raw_cloud.FindEdgePoints(200, M_PI_2, 0.0001);
@@ -131,8 +129,6 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         *downsampled_cl += raw_cloud.GetCloud();
         pcl::io::savePCDFileASCII("/home/eshan/TestEG3D/src/testeg3d/data/edge_points.pcd", *edges);
         edge_cloud.SetScanDirection(dir_vec);
-        // edge_cloud.SetSensorCoords(first_message.sensor_x, first_message.sensor_y, first_message.sensor_z, first_message.sensor_position, "first");
-        // edge_cloud.SetSensorCoords(last_message.sensor_x, last_message.sensor_y, last_message.sensor_z, last_message.sensor_position, "last");
         edge_cloud.SetEndIndices(reuse_ind_end);
         edge_cloud.AddPoints(edges);
         ROS_INFO("Appended edge points");
@@ -162,7 +158,6 @@ void ScanProcessor::msgCallBack (const testeg3d::CloudData& cloud_data) {
         reuse_vec.setZero(3);
         raw_cloud_count = reuse_count;
         cloud_gap_count = cloud_gap_reuse;
-        // first_message = reuse_message;
         segment_sizes.erase(segment_sizes.begin(), segment_sizes.end() - reuse_count);
     }
 }
